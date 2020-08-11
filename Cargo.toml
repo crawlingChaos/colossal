@@ -1,0 +1,12 @@
+[package]
+name = "colossal"
+description = "Colossal Cave Adventure"
+version = "0.1.0"
+authors = ["crawlingChaos"]
+edition = "2018"
+license = "AGPL-3.0-or-later"
+homepage = "https://github.com/crawlingChaos/colossal"
+repository = "https://github.com/crawlingChaos/colossal"
+readme = "README.md"
+
+[dependencies]
