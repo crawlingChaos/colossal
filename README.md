@@ -11,4 +11,4 @@ Good question. An almost ridiculous number of ports and modifications of this ga
 NO! It is meant to be similar to the original Fortran, which uses a mess of goto statements (something Rust doesn't have). Look upon it and be content that we don't have to write code like this anymore!
 
 ## How accurate is the game play to the original?
-It is as accurate as I could make it. I have been unable to get the original to compile, so some behavior is conjecture on my part. Namely, input parsing seems to have trouble if the first word is less than four characters, e.g. "EAT FOOD" doesn't work, but "EAT  FOOD" does. I do not know if this is a bug in my code, or the original. Help in compiling the original would be appreciated.
+It is as accurate as I could make it. I have been unable to get the original to compile, so some behavior is conjecture on my part. Namely, input parsing seems to have trouble if the first word is less than four characters, e.g. "EAT FOOD" with one space doesn't work, but with two spaces it does. I do not know if this is a bug in my code, or the original. Help in compiling the original would be appreciated.
