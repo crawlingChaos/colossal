@@ -142,6 +142,7 @@ pub enum Label {
 
 fn main() {
     let mut rand = Rand::new();
+    let mut i = 0;
     let mut ikind = 0;
     let mut jkind = 0;
     let mut lkind = 0;
@@ -200,7 +201,6 @@ fn main() {
     let mut jspkt = Array::<i32>::new(100);
     let mut iplt = Array::<i32>::new(100);
     let mut ifixt = Array::<i32>::new(100);
-    let mut i = 1;
     let setup = 1;
     let keys = 1;
     let lamp = 2;
@@ -229,6 +229,7 @@ fn main() {
         }
         ltext.set(i, 0);
     }
+    i = 1;
     let mut file = File::open();
     // The label variable and loops are needed to emulate goto statements
     let mut label = L1002;
@@ -254,16 +255,15 @@ fn main() {
                     }
                     if jkind == -1 {
                         break L1002;
-                    } else {
-                        for x in 1..=100 {
-                            k = x;
-                            kk = k;
-                            if *lline_text.get(i, 101 - k) != BLANK {
-                                break 'goto L1007;
-                            }
-                        }
-                        stop();
                     }
+                    for x in 1..=100 {
+                        k = x;
+                        kk = k;
+                        if *lline_text.get(i, 101 - k) != BLANK {
+                            break 'goto L1007;
+                        }
+                    }
+                    stop();
                 }
                 L1007 => {
                     lline_len.set(i, 100 - kk + 1);
@@ -525,7 +525,7 @@ fn main() {
                     if dtot == 0 {
                         break L71;
                     }
-                    if dtot == 0 {
+                    if dtot == 1 {
                         break L75;
                     }
                     println!(
@@ -576,6 +576,7 @@ fn main() {
                 }
                 L69 => {
                     speak(7, &rtext, &lline_text, &lline_len, &lline_cont);
+                    break L71;
                 }
                 L71 => {
                     kk = *stext.get(l);
@@ -1006,7 +1007,7 @@ fn main() {
                     if ltrubl != 3 {
                         break L2020;
                     }
-                    if j != 13 || *iplace.get(7) != 13 || *iplace.get(5) == -1 {
+                    if j != 13 || *iplace.get(7) != 13 || *iplace.get(5) != -1 {
                         break L2032;
                     }
                     yes(
@@ -1041,6 +1042,16 @@ fn main() {
                     if j != 8 || *prop.get(grate) != 0 {
                         break L2035;
                     }
+                    yes(
+                        62,
+                        63,
+                        54,
+                        &mut yea,
+                        &rtext,
+                        &lline_text,
+                        &lline_len,
+                        &lline_cont,
+                    );
                     break L2033;
                 }
                 L2033 => {
