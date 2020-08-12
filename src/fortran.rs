@@ -266,7 +266,7 @@ impl Word {
     pub fn eq(&self, s: &str) -> bool {
         let mut word = Word::new();
         for (i, c) in s.chars().enumerate() {
-            if i > 5 {
+            if i > 4 {
                 return false;
             }
             word.set(i + 1, Char { c: c as u8 });
