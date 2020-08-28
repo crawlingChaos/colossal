@@ -2,7 +2,7 @@ mod data;
 mod fortran;
 
 use fortran::{
-    achar, goto, iachar, pause, stop, Array, Array2D, Char, File, Keyboard, Rand, Word, BLANK,
+    goto, pause, stop, type_format, Array, Array2D, EndSlash, File, Keyboard, Rand, Word,
 };
 use Label::*;
 
@@ -142,6 +142,7 @@ pub enum Label {
 
 fn main() {
     let mut rand = Rand::new();
+    // ***** These variables were implicitly defined globals *****
     let mut i = 0;
     let mut ikind = 0;
     let mut jkind = 0;
@@ -170,37 +171,36 @@ fn main() {
     let mut jobj = 0;
     let mut itemp = 0;
     let mut iid = 0;
+    let mut a = 0;
+    let mut b = 0;
+    let mut wd2 = 0;
+    // ***** End of implicit global variables *****
     let mut ran = 0.0;
-    let mut a = Word::new();
-    let mut b = Word::new();
-    let mut wd2 = Word::new();
-    let mut atab = Array::<Word>::new(1000);
-    let mut lline_text = Array2D::<Char>::new(1000, 100);
-    let mut iobj = Array::<i32>::new(300);
-    let mut ichain = Array::<i32>::new(100);
-    let mut iplace = Array::<i32>::new(100);
-    let mut lline_cont = Array::<i32>::new(1000);
-    let mut ifixed = Array::<i32>::new(100);
-    let mut cond = Array::<i32>::new(300);
-    let mut prop = Array::<i32>::new(100);
-    let mut abb = Array::<i32>::new(300);
-    let mut lline_len = Array::<i32>::new(1000);
-    let mut ltext = Array::<i32>::new(300);
-    let mut stext = Array::<i32>::new(300);
-    let mut key = Array::<i32>::new(300);
-    let mut default = Array::<i32>::new(300);
-    let mut travel = Array::<i32>::new(1000);
-    let mut tk = Array::<i32>::new(25);
-    let mut ktab = Array::<i32>::new(1000);
-    let mut btext = Array::<i32>::new(200);
-    let mut dseen = Array::<i32>::new(10);
-    let mut dloc = Array::<i32>::new(10);
-    let mut odloc = Array::<i32>::new(10);
-    let mut dtrav = Array::<i32>::new(20);
-    let mut rtext = Array::<i32>::new(100);
-    let mut jspkt = Array::<i32>::new(100);
-    let mut iplt = Array::<i32>::new(100);
-    let mut ifixt = Array::<i32>::new(100);
+    let mut iobj = Array::new(300);
+    let mut ichain = Array::new(100);
+    let mut iplace = Array::new(100);
+    let mut ifixed = Array::new(100);
+    let mut cond = Array::new(300);
+    let mut prop = Array::new(100);
+    let mut abb = Array::new(300);
+    let mut lline = Array2D::new(1000, 22);
+    let mut ltext = Array::new(300);
+    let mut stext = Array::new(300);
+    let mut key = Array::new(300);
+    let mut default = Array::new(300);
+    let mut travel = Array::new(1000);
+    let mut tk = Array::new(25);
+    let mut ktab = Array::new(1000);
+    let mut atab = Array::new(1000);
+    let mut btext = Array::new(200);
+    let mut dseen = Array::new(10);
+    let mut dloc = Array::new(10);
+    let mut odloc = Array::new(10);
+    let mut dtrav = Array::new(20);
+    let mut rtext = Array::new(100);
+    let mut jspkt = Array::new(100);
+    let mut iplt = Array::new(100);
+    let mut ifixt = Array::new(100);
     let setup = 1;
     let keys = 1;
     let lamp = 2;
@@ -212,22 +212,22 @@ fn main() {
     let food = 19;
     let water = 20;
     let axe = 21;
-    jspkt.copy_from_slice(&[24, 29, 0, 31, 0, 31, 38, 38, 42, 42, 43, 46, 77, 71, 73, 75]);
-    iplt.copy_from_slice(&[
+    jspkt.data(&[24, 29, 0, 31, 0, 31, 38, 38, 42, 42, 43, 46, 77, 71, 73, 75]);
+    iplt.data(&[
         3, 3, 8, 10, 11, 14, 13, 9, 15, 18, 19, 17, 27, 28, 29, 30, 0, 0, 3, 3,
     ]);
-    ifixt.copy_from_slice(&[0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]);
-    dtrav.copy_from_slice(&[36, 28, 19, 30, 62, 60, 41, 27, 17, 15, 19, 28, 36, 300, 300]);
+    ifixt.data(&[0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]);
+    dtrav.data(&[36, 28, 19, 30, 62, 60, 41, 27, 17, 15, 19, 28, 36, 300, 300]);
     for x in 1..=300 {
         i = x;
-        stext.set(i, 0);
+        stext[i] = 0;
         if i <= 200 {
-            btext.set(i, 0);
+            btext[i] = 0;
         }
         if i <= 100 {
-            rtext.set(i, 0);
+            rtext[i] = 0;
         }
-        ltext.set(i, 0);
+        ltext[i] = 0;
     }
     i = 1;
     let mut file = File::open();
@@ -237,7 +237,7 @@ fn main() {
         label = 'goto: loop {
             match label {
                 L1002 => {
-                    file.read().read_i7(&mut ikind);
+                    file.read().read_g(&mut ikind);
                     if let Some(label) = goto(
                         &[L1100, L1004, L1004, L1013, L1020, L1004, L1004],
                         ikind + 1,
@@ -248,26 +248,26 @@ fn main() {
                 }
                 L1004 => {
                     let mut line = file.read();
-                    line.read_i7(&mut jkind);
-                    for x in 1..=100 {
+                    line.read_g(&mut jkind);
+                    for x in 3..=22 {
                         j = x;
-                        line.read_char(lline_text.get_mut(i, j));
+                        line.read_a5(&mut lline[(i, j)]);
                     }
                     if jkind == -1 {
                         break L1002;
                     }
-                    for x in 1..=100 {
+                    for x in 1..=20 {
                         k = x;
                         kk = k;
-                        if *lline_text.get(i, 101 - k) != BLANK {
+                        if !lline[(i, 21 - k)].equals(" ") {
                             break 'goto L1007;
                         }
                     }
                     stop();
                 }
                 L1007 => {
-                    lline_len.set(i, 100 - kk + 1);
-                    lline_cont.set(i, 0);
+                    lline[(i, 2)] = 20 - kk + 1;
+                    lline[(i, 1)] = 0;
                     if ikind == 6 {
                         break L1023;
                     }
@@ -277,21 +277,21 @@ fn main() {
                     if ikind == 1 {
                         break L1008;
                     }
-                    if *stext.get(jkind) != 0 {
+                    if stext[jkind] != 0 {
                         break L1009;
                     }
-                    stext.set(jkind, i);
+                    stext[jkind] = i;
                     break L1010;
                 }
                 L1008 => {
-                    if *ltext.get(jkind) != 0 {
+                    if ltext[jkind] != 0 {
                         break L1009;
                     }
-                    ltext.set(jkind, i);
+                    ltext[jkind] = i;
                     break L1010;
                 }
                 L1009 => {
-                    lline_cont.set(i - 1, i);
+                    lline[(i - 1, 1)] = i;
                     break L1010;
                 }
                 L1010 => {
@@ -306,25 +306,25 @@ fn main() {
                     if jkind < 200 {
                         break L1012;
                     }
-                    if *btext.get(jkind - 100) != 0 {
+                    if btext[jkind - 100] != 0 {
                         break L1009;
                     }
-                    btext.set(jkind - 100, i);
-                    btext.set(jkind - 200, i);
+                    btext[jkind - 100] = i;
+                    btext[jkind - 200] = i;
                     break L1010;
                 }
                 L1012 => {
-                    if *btext.get(jkind) != 0 {
+                    if btext[jkind] != 0 {
                         break L1009;
                     }
-                    btext.set(jkind, i);
+                    btext[jkind] = i;
                     break L1010;
                 }
                 L1023 => {
-                    if *rtext.get(jkind) != 0 {
+                    if rtext[jkind] != 0 {
                         break L1009;
                     }
-                    rtext.set(jkind, i);
+                    rtext[jkind] = i;
                     break L1010;
                 }
                 L1013 => {
@@ -333,32 +333,32 @@ fn main() {
                 }
                 L1014 => {
                     let mut line = file.read();
-                    line.read_i7(&mut jkind);
-                    line.read_i7(&mut lkind);
+                    line.read_g(&mut jkind);
+                    line.read_g(&mut lkind);
                     for x in 1..=10 {
                         l = x;
-                        line.read_i7(tk.get_mut(l));
+                        line.read_g(&mut tk[l]);
                     }
                     if jkind == -1 {
                         break L1002;
                     }
-                    if *key.get(jkind) != 0 {
+                    if key[jkind] != 0 {
                         break L1016;
                     }
-                    key.set(jkind, i);
+                    key[jkind] = i;
                     break L1017;
                 }
                 L1016 => {
-                    travel.set(i - 1, -travel.get(i - 1));
+                    travel[i - 1] = -travel[i - 1];
                     break L1017;
                 }
                 L1017 => {
                     for x in 1..=10 {
                         l = x;
-                        if *tk.get(l) == 0 {
+                        if tk[l] == 0 {
                             break 'goto L1019;
                         }
-                        travel.set(i, lkind * 1024 + tk.get(l));
+                        travel[i] = lkind * 1024 + tk[l];
                         i += 1;
                         if i == 1000 {
                             stop();
@@ -367,15 +367,15 @@ fn main() {
                     break L1019;
                 }
                 L1019 => {
-                    travel.set(i - 1, -travel.get(i - 1));
+                    travel[i - 1] = -travel[i - 1];
                     break L1014;
                 }
                 L1020 => {
                     for iu in 1..=1000 {
                         let mut line = file.read();
-                        line.read_i7(ktab.get_mut(iu));
-                        line.read_word(atab.get_mut(iu));
-                        if *ktab.get(iu) == -1 {
+                        line.read_g(&mut ktab[iu]);
+                        line.read_a5(&mut atab[iu]);
+                        if ktab[iu] == -1 {
                             break 'goto L1002;
                         }
                     }
@@ -385,43 +385,43 @@ fn main() {
                 L1100 => {
                     for x in 1..=100 {
                         i = x;
-                        iplace.set(i, *iplt.get(i));
-                        ifixed.set(i, *ifixt.get(i));
-                        ichain.set(i, 0);
+                        iplace[i] = iplt[i];
+                        ifixed[i] = ifixt[i];
+                        ichain[i] = 0;
                     }
                     for x in 1..=300 {
                         i = x;
-                        cond.set(i, 0);
-                        abb.set(i, 0);
-                        iobj.set(i, 0);
+                        cond[i] = 0;
+                        abb[i] = 0;
+                        iobj[i] = 0;
                     }
                     for x in 1..=10 {
                         i = x;
-                        cond.set(i, 1);
+                        cond[i] = 1;
                     }
-                    cond.set(16, 2);
-                    cond.set(20, 2);
-                    cond.set(21, 2);
-                    cond.set(22, 2);
-                    cond.set(23, 2);
-                    cond.set(24, 2);
-                    cond.set(25, 2);
-                    cond.set(26, 2);
-                    cond.set(31, 2);
-                    cond.set(32, 2);
-                    cond.set(79, 2);
+                    cond[16] = 2;
+                    cond[20] = 2;
+                    cond[21] = 2;
+                    cond[22] = 2;
+                    cond[23] = 2;
+                    cond[24] = 2;
+                    cond[25] = 2;
+                    cond[26] = 2;
+                    cond[31] = 2;
+                    cond[32] = 2;
+                    cond[79] = 2;
                     for x in 1..=100 {
                         i = x;
-                        let mut ktem = *iplace.get(i);
+                        let mut ktem = iplace[i];
                         if ktem != 0 {
-                            if *iobj.get(ktem) != 0 {
-                                ktem = *iobj.get(ktem);
-                                while *ichain.get(ktem) != 0 {
-                                    ktem = *ichain.get(ktem);
+                            if iobj[ktem] != 0 {
+                                ktem = iobj[ktem];
+                                while ichain[ktem] != 0 {
+                                    ktem = ichain[ktem];
                                 }
-                                ichain.set(ktem, i);
+                                ichain[ktem] = i;
                             } else {
-                                iobj.set(ktem, i);
+                                iobj[ktem] = i;
                             }
                         }
                     }
@@ -434,16 +434,7 @@ fn main() {
                     break L1;
                 }
                 L1 => {
-                    yes(
-                        65,
-                        1,
-                        0,
-                        &mut yea,
-                        &rtext,
-                        &lline_text,
-                        &lline_len,
-                        &lline_cont,
-                    );
+                    yes(65, 1, 0, &mut yea, &rtext, &lline);
                     l = 1;
                     loc = 1;
                     break L2;
@@ -451,11 +442,11 @@ fn main() {
                 L2 => {
                     for x in 1..=3 {
                         i = x;
-                        if *odloc.get(i) != l || *dseen.get(i) == 0 {
+                        if odloc[i] != l || dseen[i] == 0 {
                             continue;
                         }
                         l = loc;
-                        speak(2, &rtext, &lline_text, &lline_len, &lline_cont);
+                        speak(2, &rtext, &lline);
                         break 'goto L74;
                     }
                     break L74;
@@ -480,14 +471,14 @@ fn main() {
                     idwarf = 2;
                     for x in 1..=3 {
                         i = x;
-                        dloc.set(i, 0);
-                        odloc.set(i, 0);
-                        dseen.set(i, 0);
+                        dloc[i] = 0;
+                        odloc[i] = 0;
+                        dseen[i] = 0;
                     }
-                    speak(3, &rtext, &lline_text, &lline_len, &lline_cont);
-                    ichain.set(axe, *iobj.get(loc));
-                    iobj.set(loc, axe);
-                    iplace.set(axe, loc);
+                    speak(3, &rtext, &lline);
+                    ichain[axe] = iobj[loc];
+                    iobj[loc] = axe;
+                    iplace[axe] = loc;
                     break L71;
                 }
                 L63 => {
@@ -497,24 +488,25 @@ fn main() {
                     stick = 0;
                     for x in 1..=3 {
                         i = x;
-                        if 2 * i + idwarf < 8 {
+                        // Fixed crashing bug. Original line: if 2 * i + idwarf < 8 {
+                        if 2 * i + idwarf <= 8 {
                             continue;
                         }
-                        if 2 * i + idwarf > 23 && *dseen.get(i) == 0 {
+                        if 2 * i + idwarf > 23 && dseen[i] == 0 {
                             continue;
                         }
-                        odloc.set(i, *dloc.get(i));
-                        if !(*dseen.get(i) != 0 && loc > 14) {
-                            dloc.set(i, *dtrav.get(i * 2 + idwarf - 8));
-                            dseen.set(i, 0);
-                            if *dloc.get(i) != loc && *odloc.get(i) != loc {
+                        odloc[i] = dloc[i];
+                        if !(dseen[i] != 0 && loc > 14) {
+                            dloc[i] = dtrav[i * 2 + idwarf - 8];
+                            dseen[i] = 0;
+                            if dloc[i] != loc && odloc[i] != loc {
                                 continue;
                             }
                         }
-                        dseen.set(i, 1);
-                        dloc.set(i, loc);
+                        dseen[i] = 1;
+                        dloc[i] = loc;
                         dtot += 1;
-                        if *odloc.get(i) != *dloc.get(i) {
+                        if odloc[i] != dloc[i] {
                             continue;
                         }
                         attack += 1;
@@ -528,14 +520,17 @@ fn main() {
                     if dtot == 1 {
                         break L75;
                     }
-                    println!(
-                        " THERE ARE {:>2} THREATENING LITTLE DWARVES IN THE ROOM WITH YOU.",
-                        dtot
+                    type_format(
+                        &format!(
+                            " THERE ARE {:>2} THREATENING LITTLE DWARVES IN THE ROOM WITH YOU.",
+                            dtot
+                        ),
+                        EndSlash::Yes,
                     );
                     break L77;
                 }
                 L75 => {
-                    speak(4, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(4, &rtext, &lline);
                     break L77;
                 }
                 L77 => {
@@ -545,12 +540,15 @@ fn main() {
                     if attack == 1 {
                         break L79;
                     }
-                    println!(" {:>2} OF THEM THROW KNIVES AT YOU!", attack);
+                    type_format(
+                        &format!(" {:>2} OF THEM THROW KNIVES AT YOU!", attack),
+                        EndSlash::Yes,
+                    );
                     break L81;
                 }
                 L79 => {
-                    speak(5, &rtext, &lline_text, &lline_len, &lline_cont);
-                    speak(52 + stick, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(5, &rtext, &lline);
+                    speak(52 + stick, &rtext, &lline);
                     if let Some(label) = goto(&[L71, L83], stick + 1) {
                         break label;
                     }
@@ -563,11 +561,11 @@ fn main() {
                     if stick == 1 {
                         break L82;
                     }
-                    println!(" {:>2} OF THEM GET YOU.", stick);
+                    type_format(&format!(" {:>2} OF THEM GET YOU.", stick), EndSlash::Yes);
                     break L83;
                 }
                 L82 => {
-                    speak(6, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(6, &rtext, &lline);
                     break L83;
                 }
                 L83 => {
@@ -575,13 +573,25 @@ fn main() {
                     break L71;
                 }
                 L69 => {
-                    speak(7, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(7, &rtext, &lline);
                     break L71;
                 }
                 L71 => {
-                    kk = *stext.get(l);
-                    if *abb.get(l) == 0 || kk == 0 {
-                        kk = *ltext.get(l);
+                    // ***** Crash handler: Going south from swiss cheese room *****
+                    if l == 314 {
+                        println!();
+                        println!(
+                            "The original game crashes here where development was unfinished."
+                        );
+                        println!("Thanks for playing!");
+                        println!();
+                        println!("Let's put you back in the swiss cheese room.");
+                        l = 66;
+                    }
+                    // ***** End of crash handler *****
+                    kk = stext[l];
+                    if abb[l] == 0 || kk == 0 {
+                        kk = ltext[l];
                     }
                     if kk == 0 {
                         break L7;
@@ -589,28 +599,30 @@ fn main() {
                     break L4;
                 }
                 L4 => {
-                    for jj in 1..=*lline_len.get(kk) {
-                        print!("{}", lline_text.get(kk, jj));
+                    let mut output = String::new();
+                    for jj in 3..=lline[(kk, 2)] {
+                        output += &lline[(kk, jj)].to_word();
                     }
+                    type_format(&output, EndSlash::No);
                     kk += 1;
-                    if *lline_cont.get(kk - 1) != 0 {
+                    if lline[(kk - 1, 1)] != 0 {
                         break L4;
                     }
-                    println!();
+                    type_format(&"/", EndSlash::No);
                     break L7;
                 }
                 L7 => {
-                    if *cond.get(l) == 2 {
+                    if cond[l] == 2 {
                         break L8;
                     }
                     if loc == 33 && rand.gen() < 0.25 {
-                        speak(8, &rtext, &lline_text, &lline_len, &lline_cont);
+                        speak(8, &rtext, &lline);
                     }
                     j = l;
                     break L2000;
                 }
                 L8 => {
-                    kk = *key.get(loc);
+                    kk = key[loc];
                     if kk == 0 {
                         break L19;
                     }
@@ -627,7 +639,7 @@ fn main() {
                     break L9;
                 }
                 L9 => {
-                    ll = *travel.get(kk);
+                    ll = travel[kk];
                     if ll < 0 {
                         ll = -ll;
                     }
@@ -637,7 +649,7 @@ fn main() {
                     if k == ll % 1024 {
                         break L10;
                     }
-                    if *travel.get(kk) < 0 {
+                    if travel[kk] < 0 {
                         break L11;
                     }
                     kk += 1;
@@ -676,14 +688,14 @@ fn main() {
                     if k == 17 {
                         jspk = 80;
                     }
-                    speak(jspk, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(jspk, &rtext, &lline);
                     break L2;
                 }
                 L19 => {
-                    speak(13, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(13, &rtext, &lline);
                     l = loc;
                     if ifirst == 0 {
-                        speak(14, &rtext, &lline_text, &lline_len, &lline_cont);
+                        speak(14, &rtext, &lline);
                     }
                     break L21;
                 }
@@ -711,56 +723,56 @@ fn main() {
                 }
                 L23 => {
                     l = 23;
-                    if *prop.get(grate) != 0 {
+                    if prop[grate] != 0 {
                         l = 9;
                     }
                     break L2;
                 }
                 L24 => {
                     l = 9;
-                    if *prop.get(grate) != 0 {
+                    if prop[grate] != 0 {
                         l = 8;
                     }
                     break L2;
                 }
                 L25 => {
                     l = 20;
-                    if *iplace.get(nugget) != -1 {
+                    if iplace[nugget] != -1 {
                         l = 15;
                     }
                     break L2;
                 }
                 L26 => {
                     l = 22;
-                    if *iplace.get(nugget) != -1 {
+                    if iplace[nugget] != -1 {
                         l = 14;
                     }
                     break L2;
                 }
                 L27 => {
                     l = 27;
-                    if *prop.get(12) == 0 {
+                    if prop[12] == 0 {
                         l = 31;
                     }
                     break L2;
                 }
                 L28 => {
                     l = 28;
-                    if *prop.get(snake) == 0 {
+                    if prop[snake] == 0 {
                         l = 32;
                     }
                     break L2;
                 }
                 L29 => {
                     l = 29;
-                    if *prop.get(snake) == 0 {
+                    if prop[snake] == 0 {
                         l = 32;
                     }
                     break L2;
                 }
                 L30 => {
                     l = 30;
-                    if *prop.get(snake) == 0 {
+                    if prop[snake] == 0 {
                         l = 32;
                     }
                     break L2;
@@ -771,16 +783,16 @@ fn main() {
                 }
                 L32 => {
                     if idetal < 3 {
-                        speak(15, &rtext, &lline_text, &lline_len, &lline_cont);
+                        speak(15, &rtext, &lline);
                     }
                     idetal += 1;
                     l = loc;
-                    abb.set(l, 0);
+                    abb[l] = 0;
                     break L2;
                 }
                 L33 => {
                     l = 8;
-                    if *prop.get(grate) == 0 {
+                    if prop[grate] == 0 {
                         l = 9;
                     }
                     break L2;
@@ -797,7 +809,7 @@ fn main() {
                     break L38;
                 }
                 L38 => {
-                    speak(56, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(56, &rtext, &lline);
                     break L2;
                 }
                 L36 => {
@@ -831,10 +843,10 @@ fn main() {
                 }
                 L40 => {
                     if loc < 8 {
-                        speak(57, &rtext, &lline_text, &lline_len, &lline_cont);
+                        speak(57, &rtext, &lline);
                     }
                     if loc >= 8 {
-                        speak(58, &rtext, &lline_text, &lline_len, &lline_cont);
+                        speak(58, &rtext, &lline);
                     }
                     l = loc;
                     break L2;
@@ -842,63 +854,65 @@ fn main() {
                 L2000 => {
                     ltrubl = 0;
                     loc = j;
-                    abb.set(j, (*abb.get(j) + 1) % 5);
+                    abb[j] = (abb[j] + 1) % 5;
                     idark = 0;
-                    if *cond.get(j) % 2 == 1 {
+                    if cond[j] % 2 == 1 {
                         break L2003;
                     }
-                    if *iplace.get(2) != j && *iplace.get(2) != -1 {
+                    if iplace[2] != j && iplace[2] != -1 {
                         break L2001;
                     }
-                    if *prop.get(2) == 1 {
+                    if prop[2] == 1 {
                         break L2003;
                     }
                     break L2001;
                 }
                 L2001 => {
-                    speak(16, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(16, &rtext, &lline);
                     idark = 1;
                     break L2003;
                 }
                 L2003 => {
-                    i = *iobj.get(j);
+                    i = iobj[j];
                     break L2004;
                 }
                 L2004 => {
                     if i == 0 {
                         break L2011;
                     }
-                    if (i == 6 || i == 9) && *iplace.get(10) == -1 {
+                    if (i == 6 || i == 9) && iplace[10] == -1 {
                         break L2008;
                     }
                     let mut ilk = i;
-                    if *prop.get(i) != 0 {
+                    if prop[i] != 0 {
                         ilk = i + 100;
                     }
-                    kk = *btext.get(ilk);
+                    kk = btext[ilk];
                     if kk == 0 {
                         break L2008;
                     }
                     break L2005;
                 }
                 L2005 => {
-                    for jj in 1..=*lline_len.get(kk) {
-                        print!("{}", lline_text.get(kk, jj));
+                    let mut output = String::new();
+                    for jj in 3..=lline[(kk, 2)] {
+                        output += &lline[(kk, jj)].to_word();
                     }
+                    type_format(&output, EndSlash::No);
                     kk += 1;
-                    if *lline_cont.get(kk - 1) != 0 {
+                    if lline[(kk - 1, 1)] != 0 {
                         break L2005;
                     }
-                    println!();
+                    type_format(&"/", EndSlash::No);
                     break L2008;
                 }
                 L2008 => {
-                    i = *ichain.get(i);
+                    i = ichain[i];
                     break L2004;
                 }
                 L2012 => {
                     a = wd2;
-                    b = Word::new();
+                    b = i64::from_word(" ");
                     twowds = 0;
                     break L2021;
                 }
@@ -911,7 +925,7 @@ fn main() {
                     break L5200;
                 }
                 L5200 => {
-                    speak(jspk, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(jspk, &rtext, &lline);
                     break L2011;
                 }
                 L2011 => {
@@ -923,32 +937,32 @@ fn main() {
                 L2020 => {
                     getin(&mut twowds, &mut a, &mut wd2, &mut b);
                     k = 70;
-                    if a.eq("ENTER") && (wd2.eq("STREA") || wd2.eq("WATER")) {
+                    if a.equals("ENTER") && (wd2.equals("STREA") || wd2.equals("WATER")) {
                         break L2010;
                     }
-                    if a.eq("ENTER") && twowds != 0 {
+                    if a.equals("ENTER") && twowds != 0 {
                         break L2012;
                     }
                     break L2021;
                 }
                 L2021 => {
-                    if !a.eq("WEST") {
+                    if !a.equals("WEST") {
                         break L2023;
                     }
                     iwest += 1;
                     if iwest != 10 {
                         break L2023;
                     }
-                    speak(17, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(17, &rtext, &lline);
                     break L2023;
                 }
                 L2023 => {
                     for x in 1..=1000 {
                         i = x;
-                        if *ktab.get(i) == -1 {
+                        if ktab[i] == -1 {
                             break 'goto L3000;
                         }
-                        if *atab.get(i) == a {
+                        if atab[i] == a {
                             break 'goto L2025;
                         }
                     }
@@ -956,8 +970,8 @@ fn main() {
                     break L2025;
                 }
                 L2025 => {
-                    k = *ktab.get(i) % 1000;
-                    let kq = *ktab.get(i) / 1000 + 1;
+                    k = ktab[i] % 1000;
+                    let kq = ktab[i] / 1000 + 1;
                     if let Some(label) = goto(&[L5014, L5000, L2026, L2010], kq) {
                         break label;
                     }
@@ -966,7 +980,7 @@ fn main() {
                 }
                 L2026 => {
                     jverb = k;
-                    jspk = *jspkt.get(jverb);
+                    jspk = jspkt[jverb];
                     if twowds != 0 {
                         break L2028;
                     }
@@ -990,7 +1004,7 @@ fn main() {
                 }
                 L2028 => {
                     a = wd2;
-                    b = Word::new();
+                    b = i64::from_word(" ");
                     twowds = 0;
                     break L2023;
                 }
@@ -1002,56 +1016,29 @@ fn main() {
                     if rand.gen() > 0.8 {
                         jspk = 13;
                     }
-                    speak(jspk, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(jspk, &rtext, &lline);
                     ltrubl += 1;
                     if ltrubl != 3 {
                         break L2020;
                     }
-                    if j != 13 || *iplace.get(7) != 13 || *iplace.get(5) != -1 {
+                    if j != 13 || iplace[7] != 13 || iplace[5] != -1 {
                         break L2032;
                     }
-                    yes(
-                        18,
-                        19,
-                        54,
-                        &mut yea,
-                        &rtext,
-                        &lline_text,
-                        &lline_len,
-                        &lline_cont,
-                    );
+                    yes(18, 19, 54, &mut yea, &rtext, &lline);
                     break L2033;
                 }
                 L2032 => {
-                    if j != 19 || *prop.get(11) != 0 || *iplace.get(7) == -1 {
+                    if j != 19 || prop[11] != 0 || iplace[7] == -1 {
                         break L2034;
                     }
-                    yes(
-                        20,
-                        21,
-                        54,
-                        &mut yea,
-                        &rtext,
-                        &lline_text,
-                        &lline_len,
-                        &lline_cont,
-                    );
+                    yes(20, 21, 54, &mut yea, &rtext, &lline);
                     break L2033;
                 }
                 L2034 => {
-                    if j != 8 || *prop.get(grate) != 0 {
+                    if j != 8 || prop[grate] != 0 {
                         break L2035;
                     }
-                    yes(
-                        62,
-                        63,
-                        54,
-                        &mut yea,
-                        &rtext,
-                        &lline_text,
-                        &lline_len,
-                        &lline_cont,
-                    );
+                    yes(62, 63, 54, &mut yea, &rtext, &lline);
                     break L2033;
                 }
                 L2033 => {
@@ -1061,13 +1048,13 @@ fn main() {
                     break L2020;
                 }
                 L2035 => {
-                    if *iplace.get(5) != j && *iplace.get(5) != -1 {
+                    if iplace[5] != j && iplace[5] != -1 {
                         break L2020;
                     }
                     if jobj != 5 {
                         break L2020;
                     }
-                    speak(22, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(22, &rtext, &lline);
                     break L2020;
                 }
                 L2036 => {
@@ -1084,27 +1071,30 @@ fn main() {
                     break L2037;
                 }
                 L2037 => {
-                    if *iobj.get(j) == 0 || *ichain.get(*iobj.get(j)) != 0 {
+                    if iobj[j] == 0 || ichain[iobj[j]] != 0 {
                         break L5062;
                     }
                     for x in 1..=3 {
                         i = x;
-                        if *dseen.get(i) != 0 {
+                        if dseen[i] != 0 {
                             break 'goto L5062;
                         }
                     }
-                    jobj = *iobj.get(j);
+                    jobj = iobj[j];
                     break L2027;
                 }
                 L5062 => {
-                    if !b.eq(" ") {
+                    if !b.equals(" ") {
                         break L5333;
                     }
-                    println!("  {} WHAT?", a);
+                    type_format(&format!("  {} WHAT?", a.to_word()), EndSlash::Yes);
                     break L2020;
                 }
                 L5333 => {
-                    println!(" {}{} WHAT?", a, b);
+                    type_format(
+                        &format!(" {}{} WHAT?", a.to_word(), b.to_word()),
+                        EndSlash::Yes,
+                    );
                     break L2020;
                 }
                 L5014 => {
@@ -1117,7 +1107,7 @@ fn main() {
                     break L5017;
                 }
                 L5017 => {
-                    speak(23, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(23, &rtext, &lline);
                     pause("GAME IS OVER");
                     break L2011;
                 }
@@ -1126,7 +1116,7 @@ fn main() {
                     if twowds != 0 {
                         break L2028;
                     }
-                    if j == *iplace.get(k) || *iplace.get(k) == -1 {
+                    if j == iplace[k] || iplace[k] == -1 {
                         break L5004;
                     }
                     if k != grate {
@@ -1141,14 +1131,17 @@ fn main() {
                     break L502;
                 }
                 L502 => {
-                    if !b.eq(" ") {
+                    if !b.equals(" ") {
                         break L5316;
                     }
-                    println!(" I SEE NO {} HERE.", a);
+                    type_format(&format!(" I SEE NO {} HERE.", a.to_word()), EndSlash::Yes);
                     break L2011;
                 }
                 L5316 => {
-                    println!(" I SEE NO {}{} HERE.", a, b);
+                    type_format(
+                        &format!(" I SEE NO {}{} HERE.", a.to_word(), b.to_word()),
+                        EndSlash::Yes,
+                    );
                     break L2011;
                 }
                 L5098 => {
@@ -1167,73 +1160,83 @@ fn main() {
                     break L5064;
                 }
                 L5064 => {
-                    if !b.eq(" ") {
+                    if !b.equals(" ") {
                         break L5314;
                     }
-                    println!(" WHAT DO YOU WANT TO DO WITH THE {}?", a);
+                    type_format(
+                        &format!(" WHAT DO YOU WANT TO DO WITH THE {}?", a.to_word()),
+                        EndSlash::Yes,
+                    );
                     break L2020;
                 }
                 L5314 => {
-                    println!(" WHAT DO YOU WANT TO DO WITH THE {}{}?", a, b);
+                    type_format(
+                        &format!(
+                            " WHAT DO YOU WANT TO DO WITH THE {}{}?",
+                            a.to_word(),
+                            b.to_word()
+                        ),
+                        EndSlash::Yes,
+                    );
                     break L2020;
                 }
                 L9000 => {
                     if jobj == 18 {
                         break L2009;
                     }
-                    if *iplace.get(jobj) != j {
+                    if iplace[jobj] != j {
                         break L5200;
                     }
                     break L9001;
                 }
                 L9001 => {
-                    if *ifixed.get(jobj) == 0 {
+                    if ifixed[jobj] == 0 {
                         break L9002;
                     }
-                    speak(25, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(25, &rtext, &lline);
                     break L2011;
                 }
                 L9002 => {
                     if jobj != bird {
                         break L9004;
                     }
-                    if *iplace.get(rod) != -1 {
+                    if iplace[rod] != -1 {
                         break L9003;
                     }
-                    speak(26, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(26, &rtext, &lline);
                     break L2011;
                 }
                 L9003 => {
-                    if *iplace.get(4) == -1 || *iplace.get(4) == j {
+                    if iplace[4] == -1 || iplace[4] == j {
                         break L9004;
                     }
-                    speak(27, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(27, &rtext, &lline);
                     break L2011;
                 }
                 L9004 => {
-                    iplace.set(jobj, -1);
+                    iplace[jobj] = -1;
                     break L9005;
                 }
                 L9005 => {
-                    if *iobj.get(j) != jobj {
+                    if iobj[j] != jobj {
                         break L9006;
                     }
-                    iobj.set(j, *ichain.get(jobj));
+                    iobj[j] = ichain[jobj];
                     break L2009;
                 }
                 L9006 => {
-                    itemp = *iobj.get(j);
+                    itemp = iobj[j];
                     break L9007;
                 }
                 L9007 => {
-                    if *ichain.get(itemp) == jobj {
+                    if ichain[itemp] == jobj {
                         break L9008;
                     }
-                    itemp = *ichain.get(itemp);
+                    itemp = ichain[itemp];
                     break L9007;
                 }
                 L9008 => {
-                    ichain.set(itemp, *ichain.get(jobj));
+                    ichain[itemp] = ichain[jobj];
                     break L2009;
                 }
                 L9403 => {
@@ -1243,7 +1246,7 @@ fn main() {
                     break L5032;
                 }
                 L5032 => {
-                    speak(28, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(28, &rtext, &lline);
                     break L2011;
                 }
                 L5105 => {
@@ -1254,110 +1257,110 @@ fn main() {
                     if jobj == 18 {
                         break L2009;
                     }
-                    if *iplace.get(jobj) != -1 {
+                    if iplace[jobj] != -1 {
                         break L5200;
                     }
                     break L5012;
                 }
                 L5012 => {
-                    if jobj != bird || j != 19 || *prop.get(11) == 1 {
+                    if jobj != bird || j != 19 || prop[11] == 1 {
                         break L9401;
                     }
-                    speak(30, &rtext, &lline_text, &lline_len, &lline_cont);
-                    prop.set(11, 1);
+                    speak(30, &rtext, &lline);
+                    prop[11] = 1;
                     break L5160;
                 }
                 L5160 => {
-                    ichain.set(jobj, *iobj.get(j));
-                    iobj.set(j, jobj);
-                    iplace.set(jobj, j);
+                    ichain[jobj] = iobj[j];
+                    iobj[j] = jobj;
+                    iplace[jobj] = j;
                     break L2011;
                 }
                 L9401 => {
-                    speak(54, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(54, &rtext, &lline);
                     break L5160;
                 }
                 L5031 => {
-                    if *iplace.get(keys) != -1 && *iplace.get(keys) != j {
+                    if iplace[keys] != -1 && iplace[keys] != j {
                         break L5200;
                     }
                     if jobj != 4 {
                         break L5102;
                     }
-                    speak(32, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(32, &rtext, &lline);
                     break L2011;
                 }
                 L5102 => {
                     if jobj != keys {
                         break L5104;
                     }
-                    speak(55, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(55, &rtext, &lline);
                     break L2011;
                 }
                 L5104 => {
                     if jobj == grate {
                         break L5107;
                     }
-                    speak(33, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(33, &rtext, &lline);
                     break L2011;
                 }
                 L5107 => {
                     if jverb == 4 {
                         break L5033;
                     }
-                    if *prop.get(grate) != 0 {
+                    if prop[grate] != 0 {
                         break L5034;
                     }
-                    speak(34, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(34, &rtext, &lline);
                     break L2011;
                 }
                 L5034 => {
-                    speak(35, &rtext, &lline_text, &lline_len, &lline_cont);
-                    prop.set(grate, 0);
-                    prop.set(8, 0);
+                    speak(35, &rtext, &lline);
+                    prop[grate] = 0;
+                    prop[8] = 0;
                     break L2011;
                 }
                 L5033 => {
-                    if *prop.get(grate) == 0 {
+                    if prop[grate] == 0 {
                         break L5109;
                     }
-                    speak(36, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(36, &rtext, &lline);
                     break L2011;
                 }
                 L5109 => {
-                    speak(37, &rtext, &lline_text, &lline_len, &lline_cont);
-                    prop.set(grate, 1);
-                    prop.set(8, 1);
+                    speak(37, &rtext, &lline);
+                    prop[grate] = 1;
+                    prop[8] = 1;
                     break L2011;
                 }
                 L9404 => {
-                    if *iplace.get(2) != j && *iplace.get(2) != -1 {
+                    if iplace[2] != j && iplace[2] != -1 {
                         break L5200;
                     }
-                    prop.set(2, 1);
+                    prop[2] = 1;
                     idark = 0;
-                    speak(39, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(39, &rtext, &lline);
                     break L2011;
                 }
                 L9406 => {
-                    if *iplace.get(2) != j && *iplace.get(2) != -1 {
+                    if iplace[2] != j && iplace[2] != -1 {
                         break L5200;
                     }
-                    prop.set(2, 0);
-                    speak(40, &rtext, &lline_text, &lline_len, &lline_cont);
+                    prop[2] = 0;
+                    speak(40, &rtext, &lline);
                     break L2011;
                 }
                 L5081 => {
                     if jobj != 12 {
                         break L5200;
                     }
-                    prop.set(12, 1);
+                    prop[12] = 1;
                     break L2003;
                 }
                 L5300 => {
                     for id in 1..=3 {
                         iid = id;
-                        if *dseen.get(id) != 0 {
+                        if dseen[id] != 0 {
                             break 'goto L5307;
                         }
                     }
@@ -1370,26 +1373,26 @@ fn main() {
                     if jobj == bird {
                         break L5302;
                     }
-                    speak(44, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(44, &rtext, &lline);
                     break L2011;
                 }
                 L5302 => {
-                    speak(45, &rtext, &lline_text, &lline_len, &lline_cont);
-                    iplace.set(jobj, 300);
+                    speak(45, &rtext, &lline);
+                    iplace[jobj] = 300;
                     break L9005;
                 }
                 L5307 => {
                     if rand.gen() > 0.4 {
                         break L5309;
                     }
-                    dseen.set(iid, 0);
-                    odloc.set(iid, 0);
-                    dloc.set(iid, 0);
-                    speak(47, &rtext, &lline_text, &lline_len, &lline_cont);
+                    dseen[iid] = 0;
+                    odloc[iid] = 0;
+                    dloc[iid] = 0;
+                    speak(47, &rtext, &lline);
                     break L5311;
                 }
                 L5309 => {
-                    speak(48, &rtext, &lline_text, &lline_len, &lline_cont);
+                    speak(48, &rtext, &lline);
                     break L5311;
                 }
                 L5311 => {
@@ -1397,13 +1400,11 @@ fn main() {
                     break L5014;
                 }
                 L5502 => {
-                    if (*iplace.get(food) != j && *iplace.get(food) != -1)
-                        || *prop.get(food) != 0
-                        || jobj != food
+                    if (iplace[food] != j && iplace[food] != -1) || prop[food] != 0 || jobj != food
                     {
                         break L5200;
                     }
-                    prop.set(food, 1);
+                    prop[food] = 1;
                     break L5501;
                 }
                 L5501 => {
@@ -1411,13 +1412,13 @@ fn main() {
                     break L5200;
                 }
                 L5504 => {
-                    if (*iplace.get(water) != j && *iplace.get(water) != -1)
-                        || *prop.get(water) != 0
+                    if (iplace[water] != j && iplace[water] != -1)
+                        || prop[water] != 0
                         || jobj != water
                     {
                         break L5200;
                     }
-                    prop.set(water, 1);
+                    prop[water] = 1;
                     jspk = 74;
                     break L5200;
                 }
@@ -1431,7 +1432,7 @@ fn main() {
                     if jobj != water {
                         jspk = 78;
                     }
-                    prop.set(water, 1);
+                    prop[water] = 1;
                     break L5200;
                 }
             }
@@ -1439,107 +1440,109 @@ fn main() {
     }
 }
 
-fn yes(
-    x: i32,
-    y: i32,
-    z: i32,
-    yea: &mut i32,
-    rtext: &Array<i32>,
-    lline_text: &Array2D<Char>,
-    lline_len: &Array<i32>,
-    lline_cont: &Array<i32>,
-) {
-    let mut junk = 0;
-    let mut ia1 = Word::new();
-    let mut ib1 = Word::new();
-    let mut junk2 = Word::new();
-    speak(x, rtext, lline_text, lline_len, lline_cont);
-    getin(&mut junk, &mut ia1, &mut junk2, &mut ib1);
-    if ia1.eq("NO") || ia1.eq("N") {
-        *yea = 0;
-        if z != 0 {
-            speak(z, rtext, lline_text, lline_len, lline_cont);
-        }
-    } else {
-        *yea = 1;
-        if y != 0 {
-            speak(y, rtext, lline_text, lline_len, lline_cont);
-        }
-    }
-}
-
-fn speak(
-    it: i32,
-    rtext: &Array<i32>,
-    lline_text: &Array2D<Char>,
-    lline_len: &Array<i32>,
-    lline_cont: &Array<i32>,
-) {
-    let mut kkt = *rtext.get(it);
+fn speak(it: i64, rtext: &Array, lline: &Array2D) {
+    let mut kkt = rtext[it];
     if kkt == 0 {
         return;
     }
     loop {
-        for jjt in 1..=*lline_len.get(kkt) {
-            print!("{}", lline_text.get(kkt, jjt));
+        let mut output = String::new();
+        for jjt in 3..=lline[(kkt, 2)] {
+            output += &lline[(kkt, jjt)].to_word();
         }
+        type_format(&output, EndSlash::No);
         kkt += 1;
-        if *lline_cont.get(kkt - 1) == 0 {
-            break;
+        if lline[(kkt - 1, 1)] != 0 {
+            continue;
         }
+        type_format(&"/", EndSlash::No);
+        return;
     }
-    println!();
 }
 
-fn getin(twow: &mut i32, b: &mut Word, c: &mut Word, d: &mut Word) {
-    let mut a = Array::<Word>::new(5);
+fn getin(twow: &mut i64, b: &mut i64, c: &mut i64, d: &mut i64) {
+    let mut a = Array::new(5);
+    let mut m2 = Array::new(6);
+    m2.data(&[0o_4000000000, 0o_20000000, 0o_100000, 0o_400, 0o_2, 0]);
     let mut keyboard = Keyboard::open();
     let mut line = keyboard.read();
     for i in 1..=4 {
-        line.read_word(a.get_mut(i));
+        line.read_a5(&mut a[i]);
     }
-    *twow = 0;
     let mut s = 0;
-    for j in 1..=4 {
+    *b = a[1];
+    'outer: for j in 1..=4 {
         for k in 1..=5 {
-            *a.get_mut(j).get_mut(k) = upcase(*a.get(j).get(k));
-        }
-    }
-    *b = *a.get(1);
-    'j: for j in 1..=4 {
-        for k in 1..=5 {
-            if *a.get(j).get(k) == BLANK {
-                if s != 1 {
-                    s = 1;
-                    if j == 1 {
-                        for l in k..=5 {
-                            b.set(l, BLANK);
-                        }
-                    }
+            let mut mask1 = 0o_774000000000;
+            if k != 1 {
+                mask1 = 0o_177 * m2[k];
+            }
+            if (a[j] ^ 0o_201004020100) & mask1 == 0 {
+                if s == 1 {
+                    continue;
+                }
+                s = 1;
+                if j == 1 {
+                    *b = (*b & -m2[k]) | (0o_201004020100 & (-m2[k] ^ -1));
                 }
             } else {
-                if s != 0 {
-                    *twow = 1;
-                    for x in 1..=6 - k {
-                        c.set(x, *a.get(j).get(k + x - 1));
-                    }
-                    if k != 1 {
-                        for x in 6 - k + 1..=5 {
-                            c.set(x, *a.get(j + 1).get(k - 1));
-                        }
-                    }
-                    break 'j;
+                if s == 0 {
+                    continue;
                 }
+                *twow = 1;
+                let mut xx = 0;
+                let mut yy = 0;
+                shift(a[j], 7 * (k - 1), &mut xx);
+                shift(a[j + 1], 7 * (k - 6), &mut yy);
+                let mask = -m2[6 - k];
+                *c = (xx & mask) + (yy & (-2 - mask));
+                break 'outer;
             }
         }
     }
-    *d = *a.get(2);
+    *d = a[2];
 }
 
-fn upcase(ch: Char) -> Char {
-    let mut code = iachar(ch);
-    if code >= 97 && code <= 122 {
-        code -= 32;
+fn yes(x: i64, y: i64, z: i64, yea: &mut i64, rtext: &Array, lline: &Array2D) {
+    let mut junk = 0;
+    let mut ia1 = 0;
+    let mut ib1 = 0;
+    let mut junk2 = 0;
+    speak(x, rtext, lline);
+    getin(&mut junk, &mut ia1, &mut junk2, &mut ib1);
+    if ia1.equals("NO") || ia1.equals("N") {
+        *yea = 0;
+        if z != 0 {
+            speak(z, rtext, lline);
+        }
+    } else {
+        *yea = 1;
+        if y != 0 {
+            speak(y, rtext, lline);
+        }
     }
-    achar(code)
+}
+
+fn shift(val: i64, dist: i64, res: &mut i64) {
+    *res = val;
+    if dist < 0 {
+        let idist = -dist;
+        for i in 1..=idist {
+            let mut j = 0;
+            if *res < 0 {
+                // Inverted sign of constant to adjust for i64 vs i36
+                j = -0o_200000000000;
+            }
+            *res = (*res & 0o_377777777777) / 2 + j;
+        }
+    } else {
+        for i in 1..=dist {
+            let mut j = 0;
+            if *res & 0o_200000000000 != 0 {
+                // Inverted sign of constant to adjust for i64 vs i36
+                j = -0o_400000000000;
+            }
+            *res = (*res & 0o_177777777777) * 2 + j;
+        }
+    }
 }
