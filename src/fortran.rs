@@ -27,11 +27,13 @@ pub fn pause(msg: &str) {
         println!("TYPE G TO CONTINUE,X TO EXIT.");
         print!(" ");
         let mut input = String::new();
-        if let Ok(2) = io::stdin().read_line(&mut input) {
-            if input == "G\n" {
-                break;
-            } else if input == "X\n" {
-                stop();
+        if let Ok(_) = io::stdin().read_line(&mut input) {
+            if let Some(reply) = input.lines().next() {
+                if reply == "G" {
+                    break;
+                } else if reply == "X" {
+                    stop();
+                }
             }
         }
     }
@@ -180,7 +182,11 @@ impl Keyboard {
 
     pub fn read<'a>(&'a mut self) -> Line<'a> {
         self.input.truncate(0);
-        io::stdin().read_line(&mut self.input).unwrap();
+        if let Ok(_) = io::stdin().read_line(&mut self.input) {
+            if let Some(reply) = self.input.lines().next() {
+                self.input = reply.to_string();
+            }
+        }
         Line {
             chars: self.input.chars(),
         }
